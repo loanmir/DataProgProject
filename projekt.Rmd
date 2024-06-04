@@ -1,0 +1,343 @@
+---
+title: "Project"
+author: "Saša Cej"
+date: "2023-06-16"
+output: html_document
+---
+
+## Structural Protein Sequences
+### Sequence and meta data for various protein structures  
+
+One of the main goals of modern bioinformatics is to precisely determine the structure of proteins, which are one of the main reasons for the existence of life and are responsible for the majority of the biological processes that constantly occurs in all living organisms, from single-cellular bacteria to humans. The most important database for structural information of proteins nowadays is PDB, the "Protein Data Bank".  
+
+The PDB archive is a repository of atomic coordinates and other information describing proteins and other important biological macromolecules. Structural biologists use methods such as X-ray crystallography, NMR spectroscopy, and cryo-electron microscopy to determine the location of each atom relative to each other in the molecule. They then deposit this information, which is then annotated and publicly released into the archive by the wwPDB.  
+
+With the two dataframes, obtained from the [kaggle database](https://www.kaggle.com/datasets/shahir/protein-data-set), I'm going to explore which is the most used technique to obtain this protein sequences and structures, how good and reliable are the obtained sequences, and I'm gonna show an overall look on the charateristcs of those sequences and molecules.  
+
+***
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+```
+
+
+```{r}
+
+pdb_data <- read.csv("pdb_data_no_dups.csv", header = T)
+pdb_seq <- read.csv("pdb_data_seq.csv", header = T)
+
+```
+
+
+Now about the dataframes; both of them contain information of protein structures that are also present in the PDB database; in both cases, the first column, named *structureId*, stores the information on the corresponding protein in the PDB; e.g. if we take a random structureId, let's say *3ATG*, and search it in the Protein Data Bank, we see that this is the structure of the [endo-1,3-beta-glucanase ](https://www.rcsb.org/structure/3ATG) protein from *Cellulosimicrobium cellulans*. But now let's focus on the actual dataframes that i'm gonna be working with.     
+
+> The first one is *pdb_data_no_dups.csv*, and it looks like this:  
+ 
+ 
+```{r}
+
+head(pdb_data)
+
+```
+
+```{r}
+
+summary(pdb_data)
+
+```
+
+In this dataframe we can find informations about the techniques used to determine the structure of the biomolecules that were studied; since DNA (or RNA) and proteins are strongly connected to each other (the DNA sequence is basically the "recipe" for proteins), also the DNA or RNA were sequenced and not only proteins; still those are by far the most present in this dataframe as we can see below in the *macromoleculesType/number* tibble. Below we can also see the most used experimental technique, which is, as mentioned earlier, the x-ray diffraction, but we more different techinques and sometimes also a combination of different techinques to determine the structure of a biomolecule. We can also find useful informations about the esternal conditions that the techniques must be used for different proteins; we have the pHValue (different proteins are stable only at different pH values), the temperature (in Kelvins); then we have also informations about every single biomolecule; like the weight (structureMolecularWeight, measured in grams/mol), the resolution with which the structure was determined and the residueCount, which is basically the number of aminoacids(for proteins) or nucleotides (for DNA/RNA molecules) that are present in the structure. 
+
+```{r}
+
+pdb_data %>% 
+  count(experimentalTechnique) %>% 
+  .[order(.$n, decreasing = T), ]
+
+```
+
+
+```{r}
+pdb_data %>% 
+  count(macromoleculeType) %>% 
+  .[order(.$n, decreasing = T), ]
+```
+
+  
+
+> Now the second dataframe, *pdb_data_seq.csv*;  
+
+
+
+```{r}
+head(pdb_seq)
+```
+
+```{r}
+summary(pdb_seq)
+```
+
+
+This dataframe has only 5 columns compared to the 14 of the first one, but it's significantly bigger with almost 4-times more rows. That's beacause it stores the actual sequence of aminoacids/nucleotides, and those can have a different number of side chains; that means that for the same structureId (so for one corresponding row in the pdb_data dataframe) there can be even 1356 entries for the different sidechains (chainId - A is the main chain), and we have 2837 different possible sidechains.
+*See below*
+
+
+Sidechains per structureId:
+```{r}
+pdb_seq %>% 
+  count(structureId) %>% 
+  .[order(.$n, decreasing = T), ] %>% 
+  head(., n = 10) 
+```
+
+```{r}
+ 
+n_distinct(pdb_seq$chainId)
+
+```
+
+Those two columns are the only difference with the other dataframe, since the other three are again the structureId, number of residues and the type of macromolecule that we already discussed.  
+
+
+***  
+
+> What experimental technique to use for different biomolecules?  
+
+Nowadays the structures of proteins are obtained by crystalizing the molecule and then studying the crystals; we can do that with various experimental techniques, and the most used one, as we already saw, it's the x-ray diffraction. But for what types of molecules is it more utilized? And what about the other techniques?  
+
+1. X-RAY DIFFRACTION:
+
+```{r}
+
+pdb_data %>% 
+  select(experimentalTechnique, macromoleculeType) %>% 
+  filter(.$experimentalTechnique == 'X-RAY DIFFRACTION') %>%
+  count(macromoleculeType) %>% 
+  .[order(.$n, decreasing = T), ] %>% 
+  ggplot(., aes(n, macromoleculeType)) + 
+  geom_point(color = 'green') +
+  ggtitle("Usage of X-RAY DIFFRACTION per macromolecule Type")
+  
+```
+2. SOLUTION NMR:
+
+```{r}
+pdb_data %>% 
+  select(experimentalTechnique, macromoleculeType) %>% 
+  filter(.$experimentalTechnique == 'SOLUTION NMR') %>%
+  count(macromoleculeType) %>% 
+  .[order(.$n, decreasing = T), ] %>% 
+   ggplot(., aes(n, macromoleculeType)) + 
+  geom_point(color = 'red') +
+  ggtitle("Usage of SOLUTION NMR per macromolecule Type")
+```
+3. ELECTRON MICROSCOPY:
+
+```{r}
+pdb_data %>% 
+  select(experimentalTechnique, macromoleculeType) %>% 
+  filter(.$experimentalTechnique == 'ELECTRON MICROSCOPY') %>%
+  count(macromoleculeType) %>% 
+  .[order(.$n, decreasing = T), ] %>% 
+  ggplot(., aes(n, macromoleculeType)) + 
+  geom_point(color = 'blue') +
+   ggtitle("Usage of ELECTRON MICROSCOPY per macromolecule Type")
+```
+
+As expected all of the three most commonly used experimental techniques are mostly used to determine structures of proteins; from the graphs we can also see that they often used also to determine a protein/RNA (in the case of *ELECTRON MICROSCOPY*) and a protein/DNA (in the case of *X-RAY DIFFRACTION*) hybrid. But which of these techiques gives us the best resolution of the studied molecule?
+
+```{r}
+
+pdb_data %>% 
+  select(experimentalTechnique, resolution) %>% 
+  drop_na(experimentalTechnique, resolution) %>% 
+  filter(  .$experimentalTechnique == 'X-RAY DIFFRACTION' 
+         | .$experimentalTechnique == 'ELECTRON MICROSCOPY' ) %>% 
+  group_by(.$experimentalTechnique) %>% 
+  summarise('Average resolution' = mean(resolution),
+            'Minimum (best) resolution' = min(resolution),
+            'Maximum (worst) resolution' = max(resolution))
+
+```
+
+
+In crystallography, resolution is the smallest distance between crystal lattice planes that is resolved in the diffraction pattern. That means that the lower the value, the better the resolution (*unit - armstrong: Å*). So we can clearly see that we get the best resolution with the x-ray diffraction; that's one of the main reasons why this is by far the most used one. The difference in the mean resolution cmpared to electron microscopy is enormous. 
+```{r}
+
+pdb_data %>% 
+  select(experimentalTechnique, resolution) %>% 
+  drop_na(experimentalTechnique, resolution) %>% 
+  filter(  .$experimentalTechnique == 'X-RAY DIFFRACTION' 
+         | .$experimentalTechnique == 'ELECTRON MICROSCOPY' ) %>%
+  ggplot(., aes(experimentalTechnique, resolution)) +
+  geom_boxplot() +
+  ggtitle("Resolution of ELECTRON MICROSCOPY/X-RAY DIFFRACTION" ) +
+  labs(x = "Experimental technique", y = "Resolution(Å)")
+
+```
+  
+> What about the size of the molecules?  
+
+Is it harder to get a good resolution with the larger molecules? Let's take in consideration the length of the sequences; in the dataframes this equals to the residueCount column. Note also that a longer sequence of aminoacids means also a heavier molecule, so we could also look at the molecular wieght, but in this way is harder to explore the actual residues of the sequence. 
+
+```{r}
+
+pdb_data %>% 
+  select(residueCount, resolution) %>% 
+  drop_na(residueCount, resolution) %>% 
+  filter(.$residueCount < 15000 & .$residueCount > 0) %>% 
+  ggplot(., aes(residueCount, resolution)) +
+  geom_smooth() + 
+  labs(title = "Dependece of resolution and sequence length", 
+       x = "Number of residues", 
+       y = "Resolution(Å)")
+  
+  
+```
+> Molecules (sequence length + weigth) with best resolutions: 
+
+```{r}
+
+pdb_data %>% 
+  select(residueCount,structureMolecularWeight, resolution) %>% 
+  drop_na(residueCount, resolution) %>% 
+  filter(.$residueCount < 15000 & .$residueCount > 0) %>% 
+  .[order(.$resolution, decreasing = F), ] %>% 
+  head(., n = 10)
+
+```
+
+> Molecules (sequence length + weigth) with worst resolutions:
+
+```{r}
+
+pdb_data %>% 
+  select(residueCount,structureMolecularWeight, resolution) %>% 
+  drop_na(residueCount, resolution) %>% 
+  filter(.$residueCount < 15000 & .$residueCount > 0) %>% 
+  .[order(.$resolution, decreasing = F), ] %>% 
+  tail(., n = 10)
+
+```
+
+*Note: I escluded sequences longer than 15,000 residues since there are very few compared to the dimension of the dataframe*  
+
+
+
+As we can see the shorter/smaller molecules have (generally) the best resolution. But is the sequence length actually correlated to the quality of the resolution? By performing a Spearman's test to our data we can confirm that they actually are correlated;  
+
+```{r}
+library(ggstatsplot)
+```
+
+
+```{r}
+ggscatterstats(data = pdb_data,
+               x = residueCount,
+               y = resolution,
+               type = "nonparametric"
+               )
+```
+
+
+We got an extremly low *p-value*: $p = 0.00$. This means that we can accept the alternative hypotesis, that is that the number of residues of a molecule and the resolution with wich it's structure can be determined are correlated. We got even more informations than that; the *Spearman's coefficient*, $\rho  = 0.43$. As we can see also in the above graph, the two variables are positively correlated; in other words if we encrease the length of the sequence also the resolution value will encrease; and as we already established, a higher resolution value means that the resultion gets only worst.  
+
+> X-RAY DIFFRACTION: for what molecule size is it used?
+
+```{r}
+
+pdb_data %>% 
+  select(experimentalTechnique, residueCount) %>% 
+  drop_na(experimentalTechnique, residueCount) %>% 
+  filter(.$experimentalTechnique == 'X-RAY DIFFRACTION' 
+         & .$residueCount < 15000
+         & .$residueCount > 0) %>% 
+  group_by(.$experimentalTechnique) %>% 
+  summarise("Average sequence length" = mean(.$residueCount),
+            "Shortest sequence" = min(.$residueCount),
+            "Longest sequence" = max(.$residueCount), 
+            "1st quantile" = quantile(.$residueCount, 0.25),
+            "Median" = quantile(.$residueCount, 0.5),
+            "3rd quantile" = quantile(.$residueCount, 0.75))
+
+```
+
+*Number of sequences longer than 1000 residues obtained with x-ray diffraction:(that's 23% of all sequences)* 
+
+```{r}
+pdb_data %>% 
+  select(experimentalTechnique, residueCount) %>% 
+  filter(.$experimentalTechnique == 'X-RAY DIFFRACTION' 
+         & .$residueCount > 1000) %>% 
+  count(.$experimentalTechnique)
+
+```
+
+```{r}
+
+pdb_data %>% 
+  select(experimentalTechnique, residueCount) %>% 
+  drop_na(experimentalTechnique, residueCount) %>% 
+  filter(.$experimentalTechnique == 'X-RAY DIFFRACTION' 
+         & .$residueCount < 4000
+         & .$residueCount > 0) %>% 
+  ggplot(., aes(residueCount)) +
+  geom_density() +
+  labs(title = "Sequence length obtained wit x-ray difraction - Percentage", 
+       x = "Sequence length",
+       y = "Density")
+
+
+```
+
+
+As we already established, the shorter the sequences the better the final result; that's why during the structural modeling of proteins we usually study only smaller parts of the protein at once. And as we can see from the above tibble and graph, half of the obtained sequences with the x-ray diffraction are shorter than 500 residues, while 75% of them are shorter than 900 residues. Only a small percentage (23%) are longer than 1000 residues.  
+
+
+> The protein sequences obtained with x-ray diffraction 
+
+```{r}
+
+pdb_data %>% 
+  select(structureId, experimentalTechnique) %>% 
+  filter(.$experimentalTechnique == 'X-RAY DIFFRACTION') %>% 
+  inner_join(., pdb_seq, by = "structureId") %>% 
+  select(structureId, sequence, chainId, residueCount, macromoleculeType) %>%
+  filter(.$macromoleculeType == 'Protein') %>% 
+  select(structureId, sequence, chainId, residueCount) %>% 
+  head(., n = 10)
+  
+```
+
+Now we have a dataframe containing all the sequences from proteins that were obtained using the x-ray diffraction technique. We could now obtain the *.pdb* file of one or more sequences from the PDB website; with this using the package *bio3d* in r we can study the protein even more, from aligning sequences to find homolougs or other related proteins, and we can also create a contact map of how the secondary structure of this proteins looks like. Let's take the protein with structureId 101M for this example. 
+
+```{r}
+library(bio3d)
+```
+
+```{r}
+
+get.pdb("101M")
+pdbFile <- read.pdb("101M.pdb")
+
+index <- pdbFile %>% 
+  atom.select(., "calpha")
+
+cmap(pdbFile$xyz[index$xyz], 
+       dcut = 6, scut = 3) %>% 
+  plot.cmap(.)
+
+
+```
+
+In the .pdb file we can find all the coordinates of every residue in the 3D-space (x,y,z) for a certain protein. In this case I took the [101M protein](https://www.rcsb.org/structure/101M) - the *sperm whale myoglobin*. With *atom.select* we leave only the residues that are in the main - or alpha/A - chain, because those are the atoms that determine the secondary structure of proteins. Then we plot the *contact map*: the helixes are shown in this type of graphs near the diagonal, because the graph shows the distance between the same residues; that is of course equal to zero; the distance of residues that form the helixes is as well really small and close to zero, so they're aligned almost perfectly with the diagonal. In this case the secondary structure is composed only by alpha-helixes, and we can count 8 of them from the graph. The beta-sheets 
+in other proteins can be shown with a red "area" that runs parallel to the diagonal, but they don't touch - those are the parallel beta-sheets; anti-parallel sheets are represented as red areas ortogonal to the diagonal. We can also see at wich residue the various helixes start and end.  
+
+
+> Conclusion
+
+There are more different techniques for studying and obtaining various biomolecular structures. But among all of them the most utilized nowadays is the x-ray diffraction technique of the crystalazed molecules. Not only this technique produces the most accurate results, but it's also relatively cheaper and easier tha other experimental techniques (e.g electron microscopy). The understeanding of the sequence of aminoacids of a protein and their position in space is the first step of modeling and determining the secondary structure of that protein; this is a crucial step also for the development of the majority of today's drugs, since the main objective is to inhibit the protein by designing a ligand that can efficiently bind to the active site. And to do that we have to know precisely the structure of the protein itself.   
+
+

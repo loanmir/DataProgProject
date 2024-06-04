@@ -1,0 +1,42 @@
+---
+title: "Data Programming Project 2024"
+author: "Lucas Lorenzo Jakin"
+data: "2024-06-04"
+format: html
+output: html_document
+editor: visual
+---
+
+# Predicting Secondary School Student Performance Using Machine Learning
+### Student Performance Dataset
+
+Education is a key factor for achieving a long-term economic progress. During the last decades, the portuguese educational level has improved. However, the statistics keep Portugal at Europe's tail end due to its *high student failure* and *dropping rates*.
+
+In particular, failure in the core classes of Mathematics and Portuguese (native language) is extremely serious, since they provide fundamental knowledge for the success in other remaining subjects.
+
+The representing [kaggle dataset](https://www.kaggle.com/datasets/devansodariya/student-performance-data/data) contains real-world data from two Portuguese secondary schools. Data was collected using two sources: mark reports, and questionnaires. 
+
+***
+
+```{r}
+library(tidyverse)
+library(dplyr)
+library(skimr)
+dataset <- read.csv("student_data.csv", header = T)
+```
+
+Now about the dataframe; The initial version contained scarce information (only the grades and number of absences were available), it was complemented with the latter, which allowed the collection of several demographic, social and school related attributes. The final dataframe consists of 33 columns (attributes), where G3 represents the target variable, the one that we want to predict.  
+
+> The dataset looks like the following:
+
+```{r}
+  head(dataset)
+  skim(dataset)
+```
+
+The dataset information above is shown by using the **skim()** function from the **skimr package**, it provides summary statistics about variables in data frames. 
+
+As we can see from the  Data Summary, the sttribute values are distributed into two data types: String (Character) and Numerical data.
+
+
+DO TABLEEEE!!!
