@@ -1,0 +1,147 @@
+---
+title: "Covid 19 Disease: Data Analysis and Impact"
+author: "Lucas Jakin"
+date: "`r format(Sys.time(), '%e %B %Y')`"
+bibliography: biblio.bib
+editor: visual
+format: 
+  html:
+    embed-resources: true
+    #mainfont: cursive
+execute: 
+  warning: false
+  messages: false
+  echo: true
+  error: true
+---
+
+# COVID-19: Data Analysis and Impact
+
+The [Covid-19 pandemic]{style="color:red"} has profoundly affected the world, leading to significant health, economic, and social challenges. The global response has included lockdowns, travel restrictions and mass vaccination campaigns.
+
+## Overview of COVID-19
+
+Coronavirus disease 2019 is a contagious disease caused by the coronavirus **SARS-CoV-2**.The first known case was identified in Wuhan, China and it quickly spread worldwide, resulting in the COVID-19 pandemic.
+
+## Impact on global health
+
+COVID-19 has led to millions of infections and deaths worldwide. The pandemic has also overwhelmed healthcare systems and led to a long-term health complications for many survivors.
+
+## Data Analysis of Covid-19 Cases
+
+Analyzing COVID-19 data helps us understand its spread and impact. The following COVID-19 dataset contains information about the numbers of Confirmed, Death and Recovered cases across the globe. The dataset was released in 2020, so the data has not been updated for the past 4 years. This serve us just as an example. Let's explore some COVID-19 related data. Let's explore some COVID-19 related data.
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(gt)
+library(knitr)
+# Importing the COVID-19 dataset from kaggle.
+covid_data <- read.csv("country_wise_latest.csv")
+#head(covid_data)
+
+```
+
+Since the dataset contains a lot of attributes(columns), the whole dataframe structure cannot be printed on the screen, so let's print out the dataframe as tibble:
+
+```{r}
+as_tibble(covid_data)
+```
+
+------------------------------------------------------------------------
+
+### Total cases by month
+
+The selected dataset is very large and contains a huge amount of information. In order for us users to understand it, we should manipulate the data to extract the most meaningful insights from it. The example below shows the [summary]{style="color:red"} of all COVID-19 confirmed cases and deaths in all countries that are present in the **World Health Organization**:
+
+```{r}
+
+covid_summary <- covid_data %>% 
+  group_by(WHO.Region) %>% 
+  summarise(total_cases = sum(Confirmed), total_deaths = sum(Deaths)) 
+covid_summary
+  
+```
+
+```{r}
+
+covid_long <- covid_summary %>%
+  pivot_longer(cols=c(total_cases, total_deaths), names_to = "Type", values_to = "Count")
+
+ggplot(covid_long, aes(x=WHO.Region, y = Count, fill = Type)) +
+  geom_bar(stat = "identity", position = "dodge")+
+  labs(title = "COVID-19 Cases and Deaths by WHO Regions",
+       x = "Who Region", y = "Count", fill = "Type")
+```
+
+\
+The previous data about total cases and total deaths in the WHO Regions, can be seen in a clearer way in the table @tbl-covid_summary, shown below:
+
+```{r}
+#| label: tbl-covid_summary
+#| tbl-cap: "Total cases and deaths in all WHO regions"
+
+covid_summary %>% gt()
+
+```
+
+------------------------------------------------------------------------
+
+# COVID-19 Symptoms
+
+Typical **COVID-19 symptoms** often show up 2 to 14 days after contact with the virus.
+
+Symptoms can include:
+
+-   *Dry cough*
+
+-   *Shortness of breath*
+
+-   *Loss of taste or smell*
+
+-   *Extreme tiredness, calles fatigue*
+
+-   *Digestive symptoms such as upset stomach, vomiting or loose stools, calles diarrhea*
+
+-   *Pain, such as headaches and body or muscle aches*
+
+-   *Fever or chills*
+
+-   *Cold-like symptoms such as congestion, runny nose or sore throat*
+
+------------------------------------------------------------------------
+
+# COVID-19 numbers
+
+### Forecasting cumulative infected case numbers
+
+The single, simple formula that researchers used in this study is an application of the Verhulst-Pearl logistic function, stated as:\
+
+$$
+  N = \frac{PopulationCountry^*}{1 + be^{-ct}}
+$$ where N represents the cumulative number of infected cases at time t, e represents a mathematical constant approximately equal to 2.71828, c is the constant of integration, and b is the exponential function base.\
+
+### Predicting number of deaths
+
+In the case of the number of deaths in a given country caused by Covid-19, denoted as N(t), we have the following formula:\
+$$
+N(t) = \frac{N_f}{1 + \beta e^{-kt}}
+$$\
+The formula and its description can be found in the article @wiki_covid19.
+
+\
+@fig-covidFatal depicts the total number of deaths as a function of time after the day that 25 deaths had occured, for the epidemics in Spain, Germany, Italy and the UK.
+
+```{r}
+#| label: fig-covidFatal
+#| fig-cap: "Estimate of infection fatality rate"
+#| tbl-cap-location: center
+
+knitr::include_graphics("images/image2.jpg")
+```
+
+\
+
+------------------------------------------------------------------------
+
+For more detailed information, you can visit the [World Health Organization website](https://data.who.int/dashboards/covid19/cases).Moreover I personally suggest the book @covid19_textBook_2023 if you want to get more in touch with the topic.

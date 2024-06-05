@@ -103,8 +103,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="predicting-secondary-school-student-performance-using-machine-learning" class="level1">
 <h1>Predicting Secondary School Student Performance Using Machine Learning</h1>
-<section id="student-performance-dataset" class="level3">
-<h3 class="anchored" data-anchor-id="student-performance-dataset">Student Performance Dataset</h3>
+<section id="student-performance-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="student-performance-dataset">Student Performance Dataset</h2>
 <p>Education is a key factor for achieving a long-term economic progress. During the last decades, the portuguese educational level has improved. However, the statistics keep Portugal at Europe’s tail end due to its <em>high student failure</em> and <em>dropping rates</em>.</p>
 <p>In particular, failure in the core classes of Mathematics and Portuguese (native language) is extremely serious, since they provide fundamental knowledge for the success in other remaining subjects.</p>
 <p>The representing <a href="https://www.kaggle.com/datasets/devansodariya/student-performance-data/data">kaggle dataset</a> contains real-world data from two Portuguese secondary schools. Data was collected using two sources: mark reports, and questionnaires.</p>
@@ -125,7 +125,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"student_data.csv"</span>, <span class="at">header =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"student_data.csv"</span>, <span class="at">header =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now about the dataframe; The initial version contained scarce information (only the grades and number of absences were available), it was complemented with the latter, which allowed the collection of several demographic, social and school related attributes. The final dataframe consists of 33 columns (attributes), where G3 represents the target variable, the one that we want to predict.</p>
 <blockquote class="blockquote">
@@ -647,8 +648,558 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The dataset information above is shown by using the <strong>skim()</strong> function from the <strong>skimr package</strong>, it provides summary statistics about variables in data frames.</p>
-<p>As we can see from the Data Summary, the sttribute values are distributed into two data types: String (character) and Numerical data.</p>
+<p>As we can see from the Data Summary, the attribute values are distributed into two data types: String (Character) and Numerical data.</p>
+<hr>
+<p><br>
+</p>
+<p><a href="#tbl-attributes">Table&nbsp;1</a> listed below shows all the columns that are present inside the data frame combined with their descriptions and data type.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>att <span class="ot">&lt;-</span> <span class="fu">colnames</span>(dataset)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>description <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"student's school(binary)"</span>,<span class="st">"student's sex(binary)"</span> ,<span class="st">"student's age(Num)"</span>,<span class="st">"home address"</span>,<span class="st">"family size(binary)"</span> ,<span class="st">"parent's cohabition status(binary)"</span>,<span class="st">"mother's education(Num)"</span>,<span class="st">"father's education(Num)"</span>,<span class="st">"mother's job(nominal)"</span>,<span class="st">"father's job(nominal)"</span>,<span class="st">"reason to choose school(nominal)"</span>,<span class="st">"student's guardian(nominal)"</span>,<span class="st">"travel time (Num)"</span>,<span class="st">"weekly study time(Num)"</span>,<span class="st">"past class failures(Num)"</span>,<span class="st">"extra school support(binary)"</span>,<span class="st">"family educational support(binary)"</span>,<span class="st">"extra paid classes(binary)"</span>,<span class="st">"extra-curricular activities(binary)"</span>,<span class="st">"attended nursery school(binary)"</span>,<span class="st">"wants to take higher education(binary)"</span>,<span class="st">"internet access(binary)"</span>,<span class="st">"romantic relationship(binary)"</span>,<span class="st">"quality of family relationship(Num)"</span>,<span class="st">"free time(Num)"</span>,<span class="st">"going out w/ friends(Num)"</span>,<span class="st">"workday alcohol consumption(Num)"</span>,<span class="st">"weekend alcohol consumption(Num)"</span>,<span class="st">"health status(Num)"</span>,<span class="st">"absences (Num)"</span>,<span class="st">"first period grade(Num)"</span>,<span class="st">"second period grade(Num)"</span>,<span class="st">"final grade(Num)"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>table<span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Attribute =</span> att, <span class="at">Description =</span> description)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  table <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="tbl-attributes" class="anchored">
+
+<div id="dvdlduqgbs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#dvdlduqgbs table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#dvdlduqgbs thead, #dvdlduqgbs tbody, #dvdlduqgbs tfoot, #dvdlduqgbs tr, #dvdlduqgbs td, #dvdlduqgbs th {
+  border-style: none;
+}
+
+#dvdlduqgbs p {
+  margin: 0;
+  padding: 0;
+}
+
+#dvdlduqgbs .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#dvdlduqgbs .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dvdlduqgbs .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dvdlduqgbs .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dvdlduqgbs .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dvdlduqgbs .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dvdlduqgbs .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dvdlduqgbs .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dvdlduqgbs .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#dvdlduqgbs .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#dvdlduqgbs .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dvdlduqgbs .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dvdlduqgbs .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dvdlduqgbs .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dvdlduqgbs .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dvdlduqgbs .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#dvdlduqgbs .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#dvdlduqgbs .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#dvdlduqgbs .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dvdlduqgbs .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#dvdlduqgbs .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dvdlduqgbs .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dvdlduqgbs .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dvdlduqgbs .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dvdlduqgbs .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dvdlduqgbs .gt_left {
+  text-align: left;
+}
+
+#dvdlduqgbs .gt_center {
+  text-align: center;
+}
+
+#dvdlduqgbs .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dvdlduqgbs .gt_font_normal {
+  font-weight: normal;
+}
+
+#dvdlduqgbs .gt_font_bold {
+  font-weight: bold;
+}
+
+#dvdlduqgbs .gt_font_italic {
+  font-style: italic;
+}
+
+#dvdlduqgbs .gt_super {
+  font-size: 65%;
+}
+
+#dvdlduqgbs .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#dvdlduqgbs .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#dvdlduqgbs .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#dvdlduqgbs .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#dvdlduqgbs .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#dvdlduqgbs .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#dvdlduqgbs .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false"><caption>Table&nbsp;1:  <p>The preprocessed student related variables</p> </caption>
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Attribute">Attribute</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Description">Description</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Attribute" class="gt_row gt_left">school</td>
+<td headers="Description" class="gt_row gt_left">student's school(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">sex</td>
+<td headers="Description" class="gt_row gt_left">student's sex(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">age</td>
+<td headers="Description" class="gt_row gt_left">student's age(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">address</td>
+<td headers="Description" class="gt_row gt_left">home address</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">famsize</td>
+<td headers="Description" class="gt_row gt_left">family size(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Pstatus</td>
+<td headers="Description" class="gt_row gt_left">parent's cohabition status(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Medu</td>
+<td headers="Description" class="gt_row gt_left">mother's education(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Fedu</td>
+<td headers="Description" class="gt_row gt_left">father's education(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Mjob</td>
+<td headers="Description" class="gt_row gt_left">mother's job(nominal)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Fjob</td>
+<td headers="Description" class="gt_row gt_left">father's job(nominal)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">reason</td>
+<td headers="Description" class="gt_row gt_left">reason to choose school(nominal)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">guardian</td>
+<td headers="Description" class="gt_row gt_left">student's guardian(nominal)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">traveltime</td>
+<td headers="Description" class="gt_row gt_left">travel time (Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">studytime</td>
+<td headers="Description" class="gt_row gt_left">weekly study time(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">failures</td>
+<td headers="Description" class="gt_row gt_left">past class failures(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">schoolsup</td>
+<td headers="Description" class="gt_row gt_left">extra school support(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">famsup</td>
+<td headers="Description" class="gt_row gt_left">family educational support(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">paid</td>
+<td headers="Description" class="gt_row gt_left">extra paid classes(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">activities</td>
+<td headers="Description" class="gt_row gt_left">extra-curricular activities(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">nursery</td>
+<td headers="Description" class="gt_row gt_left">attended nursery school(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">higher</td>
+<td headers="Description" class="gt_row gt_left">wants to take higher education(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">internet</td>
+<td headers="Description" class="gt_row gt_left">internet access(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">romantic</td>
+<td headers="Description" class="gt_row gt_left">romantic relationship(binary)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">famrel</td>
+<td headers="Description" class="gt_row gt_left">quality of family relationship(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">freetime</td>
+<td headers="Description" class="gt_row gt_left">free time(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">goout</td>
+<td headers="Description" class="gt_row gt_left">going out w/ friends(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Dalc</td>
+<td headers="Description" class="gt_row gt_left">workday alcohol consumption(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">Walc</td>
+<td headers="Description" class="gt_row gt_left">weekend alcohol consumption(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">health</td>
+<td headers="Description" class="gt_row gt_left">health status(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">absences</td>
+<td headers="Description" class="gt_row gt_left">absences (Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">G1</td>
+<td headers="Description" class="gt_row gt_left">first period grade(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">G2</td>
+<td headers="Description" class="gt_row gt_left">second period grade(Num)</td></tr>
+    <tr><td headers="Attribute" class="gt_row gt_left">G3</td>
+<td headers="Description" class="gt_row gt_left">final grade(Num)</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+</div>
+</div>
+</div>
+<hr>
 </section>
+</section>
+<section id="exploratary-data-analysis-eda" class="level1">
+<h1>Exploratary Data Analysis (EDA)</h1>
+<p>Classification and regression are two important DM goals. Both require a supervised learning, but they are different in terms of the output representation(descrete for classification and continuous for regression). In this work, the Mathematics and Poruguese grades (i.e.&nbsp;G3 of <a href="#tbl-attributes">Table&nbsp;1</a>) will be modeled using three supervised approches:</p>
+<ul>
+<li><p><strong>Binary</strong> Classification: <em>pass</em> if G3 , else <em>fail;</em></p></li>
+<li><p><strong>5-Level</strong> Classification: based on <em>Erasmus</em> grade conversion system;</p></li>
+<li><p><strong>Regression</strong> of the G3 value : Numeric output between 0 and 20.</p></li>
+</ul>
+<hr>
+<p>Now let’s look at key insights and patterns within the dataset. The analysis focuses on the examination of the attributes distribution , identifying relationships between the attributes and visualizing the data through scatter plots, histograms and other graphical methods. The findigs will then provide a robust foundation for any subsequent analysis or modeling efforts.</p>
 </section>
 
 </main>
