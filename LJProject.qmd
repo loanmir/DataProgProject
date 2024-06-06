@@ -2,9 +2,16 @@
 title: "Data Programming Project 2024"
 author: "Lucas Lorenzo Jakin"
 data: "2024-06-04"
-format: html
 output: html_document
 editor: visual
+format: 
+  html: 
+    embed-resources: true
+execute: 
+  echo: true
+  error: true
+  warning: false
+  messaeges: false
 ---
 
 # Predicting Secondary School Student Performance Using Machine Learning
@@ -24,12 +31,13 @@ library(tidyverse)
 library(dplyr)
 library(skimr)
 library(gt)
+library(ggplot2)
 dataset <- read.csv("student_data.csv", header = T)
 ```
 
 Now about the dataframe; The initial version contained scarce information (only the grades and number of absences were available), it was complemented with the latter, which allowed the collection of several demographic, social and school related attributes. The final dataframe consists of 33 columns (attributes), where G3 represents the target variable, the one that we want to predict.
 
-> The dataset looks like the following:
+The dataset looks like the following:
 
 ```{r}
   head(dataset)
@@ -44,7 +52,7 @@ As we can see from the Data Summary, the attribute values are distributed into t
 
 \
 
-@tbl-attributes listed below shows all the columns that are present inside the data frame combined with their descriptions and data type.
+> Attributes & their descriptions
 
 ```{r}
 library(knitr)
@@ -55,6 +63,8 @@ table<- data.frame(Attribute = att, Description = description)
 
 
 ```
+
+@tbl-attributes listed below shows all the columns that are present inside the data frame combined with their descriptions and data type.
 
 ```{r}
 #| label: tbl-attributes
@@ -75,12 +85,63 @@ Classification and regression are two important DM goals. Both require a supervi
 
 -   **Regression** of the G3 value : Numeric output between 0 and 20.
 
+------------------------------------------------------------------------
+
+Now let's look at key insights and patterns within the dataset. The purpose of this analysis is to understand the underlying patterns, distributions, and relationships within the data and to visualize the data through scatter plots, histograms and other graphical methods.
+This initial analysis will not only serve the requirements of the course but will also lay the groundwork of my final thesis. The findigs will then provide a robust foundation for any subsequent analysis or modeling efforts.
+
+
 ***
 
-Now let's look at key insights and patterns within the dataset. The analysis focuses on the examination of the attributes distribution , identifying relationships between the attributes and visualizing the data through scatter plots, histograms and other graphical methods. The findigs will then provide a robust foundation for any subsequent analysis or modeling efforts.
-  
-## Overall Health vs Grade
+> Correlations between G1, G2
+
 ```{r}
-dataset %>% 
+dataset %>% select(G1,G2) %>% 
+  ggplot(.,aes(G1,G2)) +
+  geom_point(color = "darkblue", size = 3) +
+  labs(x = "G1", y = "G2") +
+  geom_smooth(color = "darkblue", method = "lm")
+  
 ```
 
+
+    
+> Correlations between G2 & G3
+
+```{r}
+dataset %>% select(G2,G3) %>% 
+  ggplot(.,aes(G2,G3)) +
+  geom_point(color = "red", size = 3) +
+  labs(x = "G2", y = "G3") +
+  geom_smooth(color = "red", method = "lm")
+  
+```
+
+
+> Correlations between G1 & G3
+
+```{r}
+dataset %>% select(G1,G3) %>% 
+  ggplot(.,aes(G1,G3)) +
+  geom_point(color = "darkgreen", size = 3) +
+  labs(x = "G1", y = "G3") +
+  geom_smooth(color = "darkgreen", method = "lm")
+```
+
+-    From the above three plots, we can see that these three attributes are correlated to each other. G1 and G2 represent the grade received from the first period and second school period, respectively. G3 is the target attribute and as we can see from the plots shown above it has a strong correlation with attributes G1 & G2. This occurs because G3 is the final year grade and this actually depends on the grades received from the first and second period. 
+
+
+***
+
+Now we'll see how are the relationships between the target attrbite G3 with some other attributes
+
+## Age vs. Grade
+
+```{r}
+dataset %>% select(age,G3) %>%
+  count(age) %>%
+  ggplot(., aes(age, n)) +
+  geom_bar()+
+  labs(x = "age", y = "Count")
+
+```
