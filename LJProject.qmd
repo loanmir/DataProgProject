@@ -87,11 +87,9 @@ Classification and regression are two important DM goals. Both require a supervi
 
 ------------------------------------------------------------------------
 
-Now let's look at key insights and patterns within the dataset. The purpose of this analysis is to understand the underlying patterns, distributions, and relationships within the data and to visualize the data through scatter plots, histograms and other graphical methods.
-This initial analysis will not only serve the requirements of the course but will also lay the groundwork of my final thesis. The findigs will then provide a robust foundation for any subsequent analysis or modeling efforts.
+Now let's look at key insights and patterns within the dataset. The purpose of this analysis is to understand the underlying patterns, distributions, and relationships within the data and to visualize the data through scatter plots, histograms and other graphical methods. This initial analysis will not only serve the requirements of the course but will also lay the groundwork of my final thesis. The findigs will then provide a robust foundation for any subsequent analysis or modeling efforts.
 
-
-***
+------------------------------------------------------------------------
 
 > Correlations between G1, G2
 
@@ -104,8 +102,6 @@ dataset %>% select(G1,G2) %>%
   
 ```
 
-
-    
 > Correlations between G2 & G3
 
 ```{r}
@@ -117,7 +113,6 @@ dataset %>% select(G2,G3) %>%
   
 ```
 
-
 > Correlations between G1 & G3
 
 ```{r}
@@ -128,20 +123,52 @@ dataset %>% select(G1,G3) %>%
   geom_smooth(color = "darkgreen", method = "lm")
 ```
 
--    From the above three plots, we can see that these three attributes are correlated to each other. G1 and G2 represent the grade received from the first period and second school period, respectively. G3 is the target attribute and as we can see from the plots shown above it has a strong correlation with attributes G1 & G2. This occurs because G3 is the final year grade and this actually depends on the grades received from the first and second period. 
+-   From the above three plots, we can see that these three attributes are correlated to each other. G1 and G2 represent the grade received from the first period and second school period, respectively. G3 is the target attribute and as we can see from the plots shown above it has a strong correlation with attributes G1 & G2. This occurs because G3 is the final year grade and this actually depends on the grades received from the first and second period.
 
-
-***
+------------------------------------------------------------------------
 
 Now we'll see how are the relationships between the target attrbite G3 with some other attributes
 
 ## Age vs. Grade
 
+# 
+
 ```{r}
 dataset %>% select(age,G3) %>%
   count(age) %>%
   ggplot(., aes(age, n)) +
-  geom_bar()+
-  labs(x = "age", y = "Count")
+  geom_col(width = 0.5)+
+  labs(x = "age", y = "Count")+
+  scale_x_continuous(breaks = seq(15,22, by = 1)) +
+  theme_minimal()+
+  geom_smooth(color = "black", span=0.3,se = F)
 
 ```
+
+-   **The plot** shows the distributions of the age of all students collected from the set of data. Analyzing the plot we can see that the majority of students fall within the range of **15 to 18**.
+
+```{r}
+dataset %>% group_by(age) %>%
+  summarize(
+    G1_mean = mean(G1),
+    G2_mean = mean(G2),
+    G3_mean = mean(G3)
+  ) %>% kable()
+ 
+```
+
+```{r}
+dataset_long <- dataset %>%  
+  pivot_longer(cols = c(G1,G2,G3), names_to = "variable",
+               values_to = "value")
+ggplot(dataset_long,aes(age, mean(value), 
+                        fill = as.factor(age))) +
+  geom_col(width = 0.8) +
+  facet_wrap(~variable, scales = "free_y") +
+  labs(x = "Age", y = "Mean", fill = "Age") +
+  scale_x_continuous(breaks = seq(15,22, by = 1)) 
+  
+
+```
+
+-   
