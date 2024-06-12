@@ -9,6 +9,7 @@ format:
     toc: true
     toc-location: right
     embed-resources: true
+bibliography: references.bib
 execute: 
   echo: true
   error: true
@@ -24,7 +25,7 @@ Education is a key factor for achieving a long-term economic progress. During th
 
 In particular, failure in the core classes of Mathematics and Portuguese (native language) is extremely serious, since they provide fundamental knowledge for the success in other remaining subjects.
 
-The representing [kaggle dataset](https://www.kaggle.com/datasets/devansodariya/student-performance-data/data) contains real-world data from two Portuguese secondary schools. Data was collected using two sources: mark reports, and questionnaires.
+The **chosen dataset** (@kaggle_dataset_StudPerformance) contains real-world data from two Portuguese secondary schools. Data was collected using two sources: mark reports, and questionnaires.
 
 ------------------------------------------------------------------------
 
@@ -228,7 +229,7 @@ dataset_long <- dataset %>%
   theme_minimal()
 ```
 
--    Surprisingly, students with mothers who are **health care professionals** receive a higher grade on average. I personally expected students with mothers who were teachers to score the highest.
+-   Surprisingly, students with mothers who are **health care professionals** receive a higher grade on average. I personally expected students with mothers who were teachers to score the highest.
 
 > Father's Job
 
@@ -241,7 +242,6 @@ dataset_long <- dataset %>%
     ) %>% kable()
 ```
 
-
 ```{r}
 #| label: fig-fJob
 #| fig-cap: "Mean grade values depending on father's job"
@@ -253,10 +253,9 @@ dataset_long <- dataset %>%
   theme_minimal()
 ```
 
--    Fathers with higher education levels tend to increase their children's performance more than fathers with lower education levels. This can be seen by the fact that students with fathers who are **health care professionals** or **teachers** receive a higher grade on average.
+-   Fathers with higher education levels tend to increase their children's performance more than fathers with lower education levels. This can be seen by the fact that students with fathers who are **health care professionals** or **teachers** receive a higher grade on average.
 
--    The father directly passes "forward" his knowledge, thus cultivating the student's knowledge
-
+-   The father directly passes "forward" his knowledge, thus cultivating the student's knowledge
 
 ## Absences vs. Grade
 
@@ -272,8 +271,6 @@ dataset_long <- dataset %>%
 
 -   This low correlation could occur, because absent students "usually" revise the material, effectively accounting for their absence. For a further explanation, we need to plot the **correlation matrix** to validate the hypothesis.
 
-
-
 ```{r}
 #| label: fig-absences
 #| fig-cap: "Heatmap - absences,G1,G2,G3"
@@ -288,9 +285,16 @@ dataset_long <- dataset %>%
                outline.color = "black")
 ```
 
--    The number of absences a student has, does not necessarily result in a lower grade overall, as absent student typically make up material they missed, effectively accounting for their absence.
+-   The number of absences a student has, does not necessarily result in a lower grade overall, as absent student typically make up material they missed, effectively accounting for their absence.
 
-***
+------------------------------------------------------------------------
 
 # Conclusion
 
+Education is a crucial element in our society. The chosen dataset was used to address the prediction of secondary student grades of two core classes (Mathematics and Portuguese) by using past school grades, demographic, social and other school related data. Conducting **Exploratory Data Analysis** is an essential step before implementing machine learning models to predict the target attribute in the dataset. EDA (just some attributes for this project) allowed me to understand the structure, quality and underlying patterns of the data, revealing important information about relationships between the attributes.
+
+The project was made with help of the following article: @datasetArticle
+
+------------------------------------------------------------------------
+
+# References
