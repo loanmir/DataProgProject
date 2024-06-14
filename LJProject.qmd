@@ -101,7 +101,7 @@ Classification and regression are two important DM goals. Both require a supervi
 
 ------------------------------------------------------------------------
 
-Now let's look at key insights and patterns within the dataset. The purpose of this analysis is to understand the underlying patterns, distributions, and relationships within the data and to visualize the data through scatter plots, histograms and other graphical methods. This initial analysis will not only serve the requirements of the course but will also lay the groundwork of my final thesis. The findigs will then provide a robust foundation for any subsequent analysis or modeling efforts.
+Now let's look at key insights and patterns within the dataset. The purpose of this analysis is to understand the underlying patterns, distributions, and relationships within the data and to visualize the data through scatter plots, histograms and other graphical methods. This initial analysis will not only serve the requirements of the course but will also lay the groundwork of my final thesis. The findings will then provide a robust foundation for any subsequent analysis or modeling efforts.
 
 ------------------------------------------------------------------------
 
@@ -295,6 +295,6 @@ Education is a crucial element in our society. The chosen dataset was used to ad
 
 The project was made with help of the following article: @datasetArticle
 
-------------------------------------------------------------------------
+
 
 # References
